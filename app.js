@@ -15,52 +15,173 @@ var sPath = path.join(__dirname, '.');
 app.use(express.static(sPath));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-function fPlay(req, res){
+function fEnd(req, res){
+  var sFrom = req.body.From;
+  var twiml = new twilio.twiml.MessagingResponse();
+  twiml.message('Meh if you want to talk to me again we can start all over!');
+  oConnections[sFrom].fCurState = fBeginning;
+  res.writeHead(200, {'Content-Type': 'text/xml'});
+  res.end(twiml.toString());
+}
+
+function fEndRon(req, res){
   var sFrom = req.body.From;
   var sAction = req.body.Body;
   var twiml = new twilio.twiml.MessagingResponse();
   if(sAction.toLowerCase().search("yes") != -1){
-    twiml.message("Oh glory. Here it is. I got it for you. Do you throw it again?");
+    twiml.message("Damn some random team then eh! Nice talk!");
+    oConnections[sFrom].fCurState = fBeginning;
   }else if(sAction.toLowerCase().search("no") != -1){
-    twiml.message("Oh well. Wait .... Over there is that a stick or a fire hydrant?");
-    oConnections[sFrom].fCurState = fStickOrHydrant;
+    twiml.message("Hard for someone to stay loyal but Meh nice talk?");
+    oConnections[sFrom].fCurState = fBeginning;
   }else{
-    twiml.message("Wow! I've never seen you do " + sAction + " before. Wait .... Over there is that a stick or a fire hydrant?")
-    oConnections[sFrom].fCurState = fStickOrHydrant;    
+    twiml.message("We didn't understand you please try again")
+    oConnections[sFrom].fCurState = fEndRon;    
   }
   res.writeHead(200, {'Content-Type': 'text/xml'});
   res.end(twiml.toString());
 }
 
-function fStick(req, res){
+function fEndMes(req, res){
   var sFrom = req.body.From;
   var sAction = req.body.Body;
   var twiml = new twilio.twiml.MessagingResponse();
-  if(sAction.toLowerCase().search("eat") != -1){
-    oConnections[sFrom].fCurState = fStickOrHydrant;
-    twiml.message("Yum! Sticks are the best thing ever lot's of roughage. Wait .... Over there is that a stick or a fire hydrant?");
-  }else if(sAction.toLowerCase().search("take") != -1){
-    twiml.message("Please play with me. Do you throw the stick?");
-    oConnections[sFrom].fCurState = fPlay;
+  if(sAction.toLowerCase().search("yes") != -1){
+    twiml.message("Damn some random team then eh! Nice talk!");
+    oConnections[sFrom].fCurState = fBeginning;
+  }else if(sAction.toLowerCase().search("no") != -1){
+    twiml.message("Hard for someone to stay loyal but Meh nice talk?");
+    oConnections[sFrom].fCurState = fBeginning;
   }else{
-    twiml.message("Wow! I've never done " + sAction + " before. Wait .... Over there is that a stick or a fire hydrant?")
-    oConnections[sFrom].fCurState = fStickOrHydrant;    
+    twiml.message("We didn't understand you please try again")
+    oConnections[sFrom].fCurState = fEndMes;    
   }
   res.writeHead(200, {'Content-Type': 'text/xml'});
   res.end(twiml.toString());
 }
 
-function fStickOrHydrant(req, res){
+function fNewTeamRon(req, res){
   var sFrom = req.body.From;
   var sAction = req.body.Body;
   var twiml = new twilio.twiml.MessagingResponse();
-  if(sAction.toLowerCase().search("stick") != -1){
-    twiml.message("I love sticks.... Should I eat it or take it to my person so he will throw it?");
-    oConnections[sFrom].fCurState = fStick;
-  }else if(sAction.toLowerCase().search("hydrant") != -1){  
-    twiml.message("Pee mail! How exciting. Wait .... Over there is that a stick or a fire hydrant?");
-  }else {
-    twiml.message("Wow! I've never seen " + sAction + " before. Wait .... Over there is that a stick or a fire hydrant?")
+  if(sAction.toLowerCase().search("psg") != -1){
+    twiml.message("Wow I hope he goes to PSG too! Great Talk!");
+    oConnections[sFrom].fCurState = fBeginning;
+  }else if(sAction.toLowerCase().search("nap") != -1){
+    twiml.message("Wow I hope he goes to NAP too! Great Talk!");
+    oConnections[sFrom].fCurState = fBeginning;
+  }else{
+    twiml.message("We didn't understand you please try again")
+    oConnections[sFrom].fCurState = fNewTeamRon;    
+  }
+  res.writeHead(200, {'Content-Type': 'text/xml'});
+  res.end(twiml.toString());
+}
+
+function fNewTeamMes(req, res){
+  var sFrom = req.body.From;
+  var sAction = req.body.Body;
+  var twiml = new twilio.twiml.MessagingResponse();
+  if(sAction.toLowerCase().search("chelsea") != -1){
+    twiml.message("Wow I hope he goes to chelsea too! Great Talk!");
+    oConnections[sFrom].fCurState = fBeginning;
+  }else if(sAction.toLowerCase().search("man city") != -1){
+    twiml.message("Wow I hope he goes to man city too! Great Talk!");
+    oConnections[sFrom].fCurState = fBeginning;
+  }else{
+    twiml.message("We didn't understand you please try again")
+    oConnections[sFrom].fCurState = fNewTeamMes;    
+  }
+  res.writeHead(200, {'Content-Type': 'text/xml'});
+  res.end(twiml.toString());
+}
+
+function fRon(req, res){
+  var sFrom = req.body.From;
+  var sAction = req.body.Body;
+  var twiml = new twilio.twiml.MessagingResponse();
+  if(sAction.toLowerCase().search("yes") != -1){
+    twiml.message("Which team PSG or NAP?");
+    oConnections[sFrom].fCurState = fNewTeamRon;
+  }else if(sAction.toLowerCase().search("no") != -1){
+    twiml.message("You think he will stay loyal forever? Yes or no");
+    oConnections[sFrom].fCurState = fEndRon;
+  }else{
+    twiml.message("We didn't understand you please try again")
+    oConnections[sFrom].fCurState = fRon;    
+  }
+  res.writeHead(200, {'Content-Type': 'text/xml'});
+  res.end(twiml.toString());
+}
+
+function fMes(req, res){
+  var sFrom = req.body.From;
+  var sAction = req.body.Body;
+  var twiml = new twilio.twiml.MessagingResponse();
+  if(sAction.toLowerCase().search("yes") != -1){
+    twiml.message("Which team chelsea or Man city?");
+    oConnections[sFrom].fCurState = fNewTeamMes;
+  }else if(sAction.toLowerCase().search("no") != -1){
+    twiml.message("You think he will stay loyal forever? Yes or no");
+    oConnections[sFrom].fCurState = fEndMes;
+  }else{
+    twiml.message("We didn't understand you please try again")
+    oConnections[sFrom].fCurState = fMes;    
+  }
+  res.writeHead(200, {'Content-Type': 'text/xml'});
+  res.end(twiml.toString());
+}
+
+
+function fMesOrRon(req, res){
+  var sFrom = req.body.From;
+  var sAction = req.body.Body;
+  var twiml = new twilio.twiml.MessagingResponse();
+  if(sAction.toLowerCase().search("messi") != -1){
+    twiml.message("Cool messi is the greatest ever! Do you think he will ever move his current team? Yes or No");
+    oConnections[sFrom].fCurState = fMes;
+  }else if(sAction.toLowerCase().search("ronaldo") != -1){
+    twiml.message("Cool ronaldo is the greatest ever! Do you think he will ever move his current team? Yes or No");
+    oConnections[sFrom].fCurState = fRon;
+  }else{
+    twiml.message("We didn't understand you please try again")
+    oConnections[sFrom].fCurState = fMesOrRon;    
+  }
+  res.writeHead(200, {'Content-Type': 'text/xml'});
+  res.end(twiml.toString());
+}
+
+function fSoccer(req, res){
+  var sFrom = req.body.From;
+  var sAction = req.body.Body;
+  var twiml = new twilio.twiml.MessagingResponse();
+  if(sAction.toLowerCase().search("yes") != -1){
+    twiml.message("Great messi or ronaldo?");
+    oConnections[sFrom].fCurState = fMesOrRon;
+  }else if(sAction.toLowerCase().search("no") != -1){
+    twiml.message("Soccer hater? Cant talk anymore, Was I a good talker?");
+    oConnections[sFrom].fCurState = fEnd;
+  }else{
+    twiml.message("We didn't understand you please try again")
+    oConnections[sFrom].fCurState = fSoccer;    
+  }
+  res.writeHead(200, {'Content-Type': 'text/xml'});
+  res.end(twiml.toString());
+}
+
+function fGoodOrBad(req, res){
+  var sFrom = req.body.From;
+  var sAction = req.body.Body;
+  var twiml = new twilio.twiml.MessagingResponse();
+  if(sAction.toLowerCase().search("good") != -1){
+    twiml.message("Great to hear do you like soccer, Yes or no?");
+    oConnections[sFrom].fCurState = fSoccer;
+  }else if(sAction.toLowerCase().search("bad") != -1){  
+    twiml.message(":( feelsbadman, Was I a good talker?");
+    oConnections[sFrom].fCurState = fEnd;
+  }else  {
+    twiml.message("We didn't understand you please try again")
+    oConnections[sFrom].fCurState = fGoodOrBad;
   }
   res.writeHead(200, {'Content-Type': 'text/xml'});
   res.end(twiml.toString());
@@ -68,9 +189,9 @@ function fStickOrHydrant(req, res){
 
 function fBeginning(req, res){
   var sFrom = req.body.From;
-  oConnections[sFrom].fCurState = fStickOrHydrant;
+  oConnections[sFrom].fCurState = fGoodOrBad;
   var twiml = new twilio.twiml.MessagingResponse();
-  twiml.message('Hi ... My name is Sheba. I am very enthusiastic about this game. Wait! Is that a stick or a fire hydrant?');
+  twiml.message('Hi ... My name is Karn. How is your day Good or Bad?');
   res.writeHead(200, {'Content-Type': 'text/xml'});
   res.end(twiml.toString());
 
